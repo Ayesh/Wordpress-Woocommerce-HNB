@@ -2,7 +2,6 @@
 
 namespace Ayesh\WooCommerceHNB;
 
-use Ayesh\WooCommerceHNB\Gateway\WC_HNB_Install;
 use Ayesh\WooCommerceHNB\Gateway\WC_HNB_Gateway;
 
 /**
@@ -32,7 +31,7 @@ function plugin_loaded() {
 
 function action_links ($links) {
 	array_unshift($links,
-		'<a href="admin.php?page=wc-settings&tab=checkout&section=woocommerce_hnb">Settings</a>');
+		'<a href="admin.php?page=wc-settings&tab=checkout&section=hnb_ipg">Settings</a>');
 	return $links;
 }
 
