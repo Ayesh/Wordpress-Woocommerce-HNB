@@ -15,7 +15,7 @@ use Ayesh\WooCommerceHNB\Gateway\WC_HNB_Gateway;
  * WC requires at least: 3.3
  * WC tested up to: 3.5
  *
- * @package WooCommerce\Blocks
+ * @package Ayesh\WooCommerceHNB
  */
 
 defined( 'ABSPATH' ) || die();

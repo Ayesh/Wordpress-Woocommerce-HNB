@@ -15,5 +15,196 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 	private const ID = 'hnb_ipg';
 	private const DESCRIPTION = 'Hatton National Bank Internet Payment Gateway to accept Visa/Master credit and debit cards issued both locally and internationally.';
 	private const IPG_URL = 'https://www.hnbpg.hnb.lk/SENTRY/PaymentGateway/Application/ReDirectLink.aspx';
+	private const INSTITUTION_NAME = 'HNB';
 
+	private static $gateway_attributes = [
+		'Version' => 1,
+		'SignatureMethod' => 'SHA1',
+		'CaptureFlag' => 'A',
+	];
+
+	private $MerID, $AcqID, $pass;
+	private $PurchaseCurrency, $PurchaseCurrencyExponent;
+	private $TestFlag, $ShipToLastName, $ResponseCode, $MerRespURL;
+
+
+	public function __construct() {
+		$this->initializeMetaData();
+
+		// Load the settings.
+		$this->init_form_fields();
+		$this->init_settings();
+
+		// Get settings.
+		$this->title                    = $this->get_option('title');
+		$this->description              = $this->get_option('description');
+		$this->MerID                    = $this->settings['MerID'];
+		$this->AcqID                    = $this->settings['AcqID'];
+		$this->pass                     = $this->settings['pass'];
+
+		$this->PurchaseCurrency         = $this->settings['PurchaseCurrency'];
+		$this->PurchaseCurrencyExponent = $this->settings['PurchaseCurrencyExponent'];
+		$this->CaptureFlag              = $this->settings['CaptureFlag'];
+
+		add_action('woocommerce_update_options_payment_gateways_' . $this->id,
+			[$this, 'process_admin_options']);
+	}
+
+	private function initializeMetaData(): void {
+		$this->id                 = self::ID;
+		$this->icon               = apply_filters('woocommerce_hnb_icon',
+			plugins_url('assets/images/cards.png',
+			dirname(plugin_dir_path(__FILE__))));
+		$this->method_title       = __(self::NAME, 'woocommerce-hnb');
+		$this->method_description = __(self::DESCRIPTION, 'woocommerce-hnb');
+		$this->order_button_text  = __('Proceed to payment', 'woocommerce-hnb');
+		$this->has_fields         = FALSE;
+	}
+
+	public function init_form_fields(): void {
+		$this->form_fields                = [];
+		$this->form_fields['enabled']     = [
+			'title'   => __('Enable/Disable'),
+			'type'    => 'checkbox',
+			'label'   => __('Enable HNB IPG Module.'),
+			'default' => 'no',
+		];
+		$this->form_fields['title']       = [
+			'title'       => __('Title'),
+			'type'        => 'text',
+			'description' => __('The title end users see when making the payment'),
+			'default'     => __('Credit or debit card'),
+		];
+		$this->form_fields['description'] = [
+			'title'       => __('Description'),
+			'type'        => 'textarea',
+			'description' => __('A description to show to end users.'),
+			'default'     => sprintf(__('You will be sent to %s secure payment gateway to complete the payment.'), self::INSTITUTION_NAME),
+		];
+		$this->form_fields['_version']     = [
+			'title'       => __('Gateway Version'),
+			'type'        => 'markup',
+			'description' => '',
+			'value'     => self::$gateway_attributes['Version'],
+		];
+		$this->form_fields['MerID']       = [
+			'title'       => __('Merchant ID'),
+			'type'        => 'text',
+			'description' => sprintf(__('Merchant ID, provided by %s.'), self::INSTITUTION_NAME),
+			'default'     => '',
+		];
+		$this->form_fields['AcqID']       = [
+			'title'       => __('Acquirer ID'),
+			'type'        => 'text',
+			'description' => sprintf(__('Acquirer ID, provided by %s.'), self::INSTITUTION_NAME),
+			'default'     => '',
+		];
+		$this->form_fields['pass']        = [
+			'title'       => __('Password'),
+			'type'        => 'password',
+			'description' => sprintf(__('Payment gateway password, provided by %s.'), self::INSTITUTION_NAME),
+			'default'     => '',
+		];
+
+		$currency = get_woocommerce_currency();
+		if ($currency) {
+			$currency_iso = $this->getCurrencyList_ISO4217($currency);
+			$currency_display = $currency_iso
+				? sprintf('%s (%d)', $currency, $currency_iso)
+				: sprintf('%s %s', $currency, __('Unsupported'));
+
+			$this->form_fields['_currency'] = [
+				'title'       => __('Currency'),
+				'type'        => 'markup',
+				'description' => sprintf(__('%s gateway requires an ISO 4217 currency code. This currency code taken from your %s default currency.'),
+					self::INSTITUTION_NAME, __('WooCommerce')),
+				'value'     => $currency_display,
+			];
+
+			$this->form_fields['_currency_exponent'] = [
+				'title'       => __('Currency Exponent'),
+				'type'        => 'markup',
+				'description' => 'The exponent value used to normalize currencies. This value is automatically deduced.',
+				'value'     => $this->getCurrencyExponent($currency),
+			];
+        }
+
+		$this->form_fields['_signature'] = [
+			'title'       => __('Signature Method'),
+			'type'        => 'markup',
+			'description' => sprintf(__('Make sure this value matches the documentation provided %s. This is an important aspect of payment validation, and a mismatch can indicate this plugin version is not compatible with your implementation.'), self::INSTITUTION_NAME),
+			'value'     => self::$gateway_attributes['SignatureMethod'],
+		];
+
+		$this->form_fields['_caputure'] = [
+			'title'       => __('Capture Flag'),
+			'type'        => 'markup',
+			'description' => __('Payment capturing method. A value of "A" means automatic authorization and capturing. This value is not configurable at the moment.'),
+			'value'     => self::$gateway_attributes['CaptureFlag'],
+		];
+
+		$this->form_fields['_gateway_url'] = [
+			'title'       => __('Gateway URL'),
+			'type'        => 'markup',
+			'description' => __('The URL endpoint to submit data. This value is indicative.'),
+			'value'     => self::IPG_URL,
+		];
+	}
+
+
+	public function generate_markup_html($key, $data) {
+		$field_key = $this->get_field_key($key);
+		$defaults  = array(
+			'title'             => '',
+			'class'             => '',
+			'css'               => '',
+			'placeholder'       => '',
+			'type'              => 'text',
+			'desc_tip'          => FALSE,
+			'description'       => '',
+			'custom_attributes' => array(),
+			'value'             => '',
+		);
+
+		$data = wp_parse_args( $data, $defaults );
+
+		ob_start();
+		?>
+		<tr valign="top">
+			<th scope="row" class="titledesc">
+				<label for="<?php echo esc_attr( $field_key ); ?>"><?php echo wp_kses_post( $data['title'] ); ?> <?php echo $this->get_tooltip_html( $data ); // WPCS: XSS ok. ?></label>
+			</th>
+			<td class="forminp">
+				<fieldset>
+					<legend class="screen-reader-text"><span><?php echo wp_kses_post( $data['title'] ); ?></span></legend>
+					<span class="wc_input_markup <?php echo esc_attr( $data['class'] ); ?>" id="<?php echo esc_attr( $field_key ); ?>" style="<?php echo esc_attr( $data['css'] ); ?>" <?php echo $this->get_custom_attribute_html( $data ); // WPCS: XSS ok. ?> />
+					<?php echo wp_kses_post($data['value']); ?>
+					<?php echo $this->get_description_html( $data ); // WPCS: XSS ok. ?>
+				</fieldset>
+			</td>
+		</tr>
+		<?php
+
+		return ob_get_clean();
+	}
+
+
+	private function getCurrencyList_ISO4217(string $currency_code = 'LKR'): ?int {
+		$map = [
+			'AED' => 784,
+			'AUD' => 036,
+			'CAD' => 124,
+			'CNY' => 156,
+			'EUR' => 978,
+			'INR' => 356,
+			'LKR' => 144,
+			'USD' => 840,
+		];
+
+		return $map[$currency_code] ?? NULL;
+	}
+
+	private function getCurrencyExponent(string $currency = 'LKR'): int {
+	    return 2; // All supported currencies use 2.
+    }
 }
