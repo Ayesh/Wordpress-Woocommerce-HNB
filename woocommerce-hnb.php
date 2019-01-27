@@ -28,13 +28,14 @@ function load(): void {
 	include_once dirname( __FILE__ ) . '/src/Gateway/WC_HNB_Gateway.php';
 }
 
-function action_links ($links) {
+function action_links (array $links): array {
 	array_unshift($links,
 		'<a href="admin.php?page=wc-settings&tab=checkout&section=hnb_ipg">Settings</a>');
 	return $links;
 }
 
-function payment_gateway($methods) {
+function payment_gateway(array $methods): array {
+	load();
 	$methods[] = WC_HNB_Gateway::class;
 	return $methods;
 }
