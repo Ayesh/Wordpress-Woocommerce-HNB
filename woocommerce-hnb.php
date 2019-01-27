@@ -20,12 +20,11 @@ use Ayesh\WooCommerceHNB\Gateway\WC_HNB_Gateway;
 
 defined( 'ABSPATH' ) || die();
 
-add_action('plugins_loaded', __NAMESPACE__ . '\plugin_loaded', 0);
 add_filter( 'plugin_action_links_woocommerce-hnb/woocommerce-hnb.php', __NAMESPACE__ . '\action_links');
 add_filter('woocommerce_payment_gateways', __NAMESPACE__ . '\payment_gateway');
 
 
-function plugin_loaded() {
+function load(): void {
 	include_once dirname( __FILE__ ) . '/src/Gateway/WC_HNB_Gateway.php';
 }
 
