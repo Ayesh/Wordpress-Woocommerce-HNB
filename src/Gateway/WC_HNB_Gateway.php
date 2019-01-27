@@ -207,4 +207,8 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 	private function getCurrencyExponent(string $currency = 'LKR'): int {
 	    return 2; // All supported currencies use 2.
     }
+
+	public static function handlePayload(array $payload): void {
+
+	}
 }
