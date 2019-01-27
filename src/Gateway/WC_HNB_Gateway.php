@@ -208,7 +208,54 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 	    return 2; // All supported currencies use 2.
     }
 
-	public static function handlePayload(array $payload): void {
+	public static function handlePayload(array &$payload): void {
+	    $code = self::validatePayload($payload);
+	    if ($code !== 0) {
+	        wp_die($code);
+        }
+
+
+	    $instance = new static();
+	    $instance->handlePayloadReal($payload);
+	    die(0);
+	}
+
+	private static function validatePayload(array $payload): int {
+		if (empty($payload['order_id'])
+            || !($order_id = (int) $payload['order_id'])
+            || empty($payload['token'])
+            || !is_string($payload['token'])
+        ) {
+			return -1;
+		}
+
+		if (!self::validateToken($payload['token'], $order_id)) {
+		    return -1;
+        }
+
+		return 0;
+    }
+
+	private function generateCallbackUrl(int $order_id): string {
+		return add_query_arg(
+		    [
+		        'wc-api' => __CLASS__,
+                'order_id' => $order_id,
+                'token' => self::generateToken($order_id),
+            ], home_url( '/' ) );
+    }
+
+    private static function generateToken(int $order_id): string {
+      $key = wp_salt('nonce');
+      return hash_hmac('sha256', __CLASS__ . '-' . $order_id, $key);
+    }
+
+    private static function validateToken(string $given_token, int $order_id): bool {
+        $valid_token = self::generateToken($order_id);
+        return hash_equals($valid_token, $given_token);
+    }
+
+	private function handlePayloadReal(array &$payload): void {
 
 	}
 }

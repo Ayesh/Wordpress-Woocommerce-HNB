@@ -20,9 +20,9 @@ use Ayesh\WooCommerceHNB\Gateway\WC_HNB_Gateway;
 
 defined( 'ABSPATH' ) || die();
 
-add_filter( 'plugin_action_links_woocommerce-hnb/woocommerce-hnb.php', __NAMESPACE__ . '\action_links');
+add_filter('plugin_action_links_woocommerce-hnb/woocommerce-hnb.php', __NAMESPACE__ . '\action_links');
 add_filter('woocommerce_payment_gateways', __NAMESPACE__ . '\payment_gateway');
-add_filter('init', __NAMESPACE__ . '\init');
+add_action('woocommerce_api_ayeshwoocommercehnbgatewaywc_hnb_gateway', __NAMESPACE__ . '\handle_callback');
 
 
 function load(): void {
@@ -30,8 +30,7 @@ function load(): void {
 }
 
 function action_links (array $links): array {
-	array_unshift($links,
-		'<a href="admin.php?page=wc-settings&tab=checkout&section=hnb_ipg">Settings</a>');
+	array_unshift($links,'<a href="admin.php?page=wc-settings&tab=checkout&section=hnb_ipg">Settings</a>');
 	return $links;
 }
 
@@ -41,15 +40,8 @@ function payment_gateway(array $methods): array {
 	return $methods;
 }
 
-function init(): void {
-	if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !is_countable($_SERVER['REQUEST_METHOD'])) {
-		return;
-	}
-
-	if (!isset($_POST['OrderID'], $_POST['ResponseCode'], $_POST['ReasonCode'])) {
-		return;
-	}
-
+function handle_callback() {
 	load();
-	WC_HNB_Gateway::handlePayload($_POST);
+	$request = &$_REQUEST;
+	WC_HNB_Gateway::handlePayload($request);
 }
