@@ -6,12 +6,12 @@ use Ayesh\WooCommerceHNB\Gateway\WC_HNB_Gateway;
 
 /**
  * Plugin Name: WooCommerce HNB
- * Plugin URI: https://wordpress.org/plugins/woocommerce-hnb
+ * Plugin URI: https://wordpress.org/plugins/woo-hnb
  * Description: WooCommerce Payment Gateway plugin integration with Hatton National Bank Sri Lanka.
  * Version: 1.0.0
  * Author: Ayesh Karunaratne
  * Author URI: https://ayesh.me/open-source
- * Text Domain:  woocommerce-hnb
+ * Text Domain: woo-hnb
  * WC requires at least: 3.3
  * WC tested up to: 3.5
  *
