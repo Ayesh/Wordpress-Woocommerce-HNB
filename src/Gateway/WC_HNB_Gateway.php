@@ -17,6 +17,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 	private const DESCRIPTION = 'Hatton National Bank Internet Payment Gateway to accept Visa/Master credit and debit cards issued both locally and internationally.';
 	private const IPG_URL = 'https://www.hnbpg.hnb.lk/SENTRY/PaymentGateway/Application/ReDirectLink.aspx';
 	private const INSTITUTION_NAME = 'HNB';
+	private const TD = 'woo-hnb';
 
 	private static $gateway_attributes = [
 		'Version' => '1.0.0',
@@ -38,9 +39,9 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 		$this->icon               = apply_filters('woocommerce_hnb_icon',
 			plugins_url('assets/images/cards.png',
 				\dirname(plugin_dir_path(__FILE__))));
-		$this->method_title       = __(self::NAME, 'woocommerce-hnb');
-		$this->method_description = __(self::DESCRIPTION, 'woocommerce-hnb');
-		$this->order_button_text  = __('Proceed to payment', 'woocommerce-hnb');
+		$this->method_title       = __(self::NAME, 'woocommerce-hnb', self::TD);
+		$this->method_description = __(self::DESCRIPTION, 'woocommerce-hnb', self::TD);
+		$this->order_button_text  = __('Proceed to payment', 'woocommerce-hnb', self::TD);
 		$this->has_fields         = FALSE;
 	}
 
@@ -62,49 +63,49 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 	public function init_form_fields(): void {
 		$this->form_fields                = [];
 		$this->form_fields['enabled']     = [
-			'title'   => \sprintf(__('Enable %s method'),self::INSTITUTION_NAME),
+			'title'   => \sprintf(__('Enable %s method', self::TD),self::INSTITUTION_NAME),
 			'type'    => 'checkbox',
-			'label'   => __('Enable HNB IPG Module.'),
+			'label'   => __('Enable HNB IPG Module.', self::TD),
 			'default' => 'no',
 		];
 		$this->form_fields['title']       = [
-			'title'       => __('Title'),
+			'title'       => __('Title', self::TD),
 			'type'        => 'text',
-			'description' => __('Payment method name customers see when making the payment.'),
-			'default'     => __('Credit or debit card'),
+			'description' => __('Payment method name customers see when making the payment.', self::TD),
+			'default'     => __('Credit or debit card', self::TD),
 		];
 		$this->form_fields['description'] = [
-			'title'       => __('Description'),
+			'title'       => __('Description', self::TD),
 			'type'        => 'textarea',
-			'description' => __('A description to show to when this payment method is selected.'),
-			'default'     => \sprintf(__('You will be sent to %s secure payment gateway to complete the payment.'),
+			'description' => __('A description to show to when this payment method is selected.', self::TD),
+			'default'     => \sprintf(__('You will be sent to %s secure payment gateway to complete the payment.', self::TD),
 				self::INSTITUTION_NAME),
 		];
 		$this->form_fields['_version']    = [
-			'title' => __('Gateway Version'),
+			'title' => __('Gateway Version', self::TD),
 			'type'  => 'markup',
 			'value' => self::$gateway_attributes['Version'],
 		];
 		$this->form_fields['MerID']       = [
-			'title'             => __('Merchant ID'),
+			'title'             => __('Merchant ID', self::TD),
 			'type'              => 'number',
-			'description'       => \sprintf(__('Merchant ID, provided by %s.'),
+			'description'       => \sprintf(__('Merchant ID, provided by %s.', self::TD),
 				self::INSTITUTION_NAME),
 			'desc_tip'          => TRUE,
 			'custom_attributes' => ['required' => 'required'],
 		];
 		$this->form_fields['AcqID']       = [
-			'title'             => __('Acquirer ID'),
+			'title'             => __('Acquirer ID', self::TD),
 			'type'              => 'number',
-			'description'       => \sprintf(__('Acquirer ID, provided by %s.'),
+			'description'       => \sprintf(__('Acquirer ID, provided by %s.', self::TD),
 				self::INSTITUTION_NAME),
 			'desc_tip'          => TRUE,
 			'custom_attributes' => ['required' => 'required'],
 		];
 		$this->form_fields['pass']        = [
-			'title'             => __('Password'),
+			'title'             => __('Password', self::TD),
 			'type'              => 'password',
-			'description'       => \sprintf(__('Payment gateway password, provided by %s.'),
+			'description'       => \sprintf(__('Payment gateway password, provided by %s.', self::TD),
 				self::INSTITUTION_NAME),
 			'desc_tip'          => TRUE,
 			'custom_attributes' => ['required' => 'required'],
@@ -116,47 +117,47 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 			$currency_display = $currency_iso
 				? \sprintf('%s (%d)', $currency, $currency_iso)
 				: \sprintf('%s %s', $currency,
-					__('Unsupported. Gateway disabled.'));
+					__('Unsupported. Gateway disabled.', self::TD));
 
 			$this->form_fields['_currency'] = [
 				'title'       => __('Currency'),
 				'type'        => 'markup',
-				'description' => \sprintf(__('%s gateway requires an ISO 4217 currency code. This currency code taken from your %s default currency.'),
-					self::INSTITUTION_NAME, __('WooCommerce')),
+				'description' => \sprintf(__('%s gateway requires an ISO 4217 currency code. This currency code taken from your %s default currency.', self::TD),
+					self::INSTITUTION_NAME, __('WooCommerce')), // No text domain.
 				'value'       => $currency_display,
 				'desc_tip'    => TRUE,
 			];
 
 			$this->form_fields['_currency_exponent'] = [
-				'title'       => __('Currency Exponent'),
+				'title'       => __('Currency Exponent', self::TD),
 				'type'        => 'markup',
-				'description' => 'The exponent value used to normalize currencies. This value is automatically deduced.',
+				'description' => __('The exponent value used to normalize currencies. This value is automatically deduced.', self::TD),
 				'value'       => $this->getCurrencyExponent($currency),
 				'desc_tip'    => TRUE,
 			];
 		}
 
 		$this->form_fields['_signature'] = [
-			'title'       => __('Signature Method'),
+			'title'       => __('Signature Method', self::TD),
 			'type'        => 'markup',
-			'description' => \sprintf(__('Make sure this value matches the documentation provided %s. This is an important aspect of payment validation, and a mismatch can indicate this plugin version is not compatible with your implementation.'),
+			'description' => \sprintf(__('Make sure this value matches the documentation provided %s. This is an important aspect of payment validation, and a mismatch can indicate this plugin version is not compatible with your implementation.', self::TD),
 				self::INSTITUTION_NAME),
 			'value'       => self::$gateway_attributes['SignatureMethod'],
 			'desc_tip'    => TRUE,
 		];
 
 		$this->form_fields['_caputure'] = [
-			'title'       => __('Capture Flag'),
+			'title'       => __('Capture Flag', self::TD),
 			'type'        => 'markup',
-			'description' => __('Payment capturing method. A value of "A" means automatic authorization and capturing. This value is not configurable at the moment.'),
+			'description' => __('Payment capturing method. A value of "A" means automatic authorization and capturing. This value is not configurable at the moment.', self::TD),
 			'value'       => self::$gateway_attributes['CaptureFlag'],
 			'desc_tip'    => TRUE,
 		];
 
 		$this->form_fields['_gateway_url'] = [
-			'title'       => __('Gateway URL'),
+			'title'       => __('Gateway URL', self::TD),
 			'type'        => 'markup',
-			'description' => __('The URL endpoint to submit data. This value is indicative.'),
+			'description' => __('The URL endpoint to submit data. This value is indicative.', self::TD),
 			'value'       => self::IPG_URL,
 			'desc_tip'    => TRUE,
 		];
@@ -250,7 +251,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
             case 2:
 				$order->add_order_note(sprintf('Payment Declined: Reason code: %s. Reason: %s', esc_html($payload['ReasonCode']), esc_html($payload['ReasonCodeDesc'])));
 				$order->add_order_note('Payment declined.', 1);
-				wc_add_notice(__('Payment declined. Please try again.'), 'error');
+				wc_add_notice(__('Payment declined. Please try again.', self::TD), 'error');
 				wp_redirect($order->get_checkout_payment_url(false));
 				break;
 
@@ -264,13 +265,13 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
                 }
 				$order->add_order_note('Payment signature mismatch. This indicates a possible forged requests.');
 				$order->add_order_note('Payment validation failed.', 1);
-				wc_add_notice(__('Payment validation error. Please try again.'), 'error');
+				wc_add_notice(__('Payment validation error. Please try again.', self::TD), 'error');
 				break;
 
 			default:
 				$order->add_order_note(sprintf('Payment Error: Reason code: %s. Reason: %s', esc_html($payload['ReasonCode']), esc_html($payload['ReasonCodeDesc'])));
 				$order->add_order_note('Payment Error', 1);
-				wc_add_notice(__('Payment error. Please try again.'), 'error');
+				wc_add_notice(__('Payment error. Please try again.', self::TD), 'error');
 				wp_redirect($order->get_checkout_payment_url(false));
 				break;
 		}
@@ -301,8 +302,8 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 			$input_fields .= "<input type='hidden' name='$key' value='$value' />";
         }
 	    $url = esc_attr(self::IPG_URL);
-	    $submit_text = __('Proceed to payment');
-	    $cancel_text = __('Cancel and return');
+	    $submit_text = __('Proceed to payment', self::TD);
+	    $cancel_text = __('Cancel and return', self::TD);
 	    $id = self::ID;
 	    $cancel_url = $order->get_cancel_order_url();
 	    echo <<<TEXT
