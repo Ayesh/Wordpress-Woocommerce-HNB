@@ -388,4 +388,10 @@ TEXT;
 
 		return ob_get_clean();
 	}
+
+	public function __debugInfo() {
+		return [
+		    'attributes' => self::$gateway_attributes,
+        ];
+	}
 }
