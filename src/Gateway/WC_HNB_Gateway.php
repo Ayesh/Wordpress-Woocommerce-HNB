@@ -300,12 +300,12 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 TEXT;
     }
 
-    private function generateSignatureOrder(WC_Order $order, string $formatted_total, int $currency_code): string {
-	    $string = "{$this->pass}{$order->get_id()}{$formatted_total}{$currency_code}";
-		return base64_encode(hash('sha1', $string, true));
+    private function generateSignatureOrder(WC_Order $order, string $formatted_total = null, int $currency_code = null): string {
+	    $string = "{$this->pass}{$this->MerID}{$this->AcqID}{$order->get_id()}{$formatted_total}{$currency_code}";
+		return \base64_encode(\hash('sha1', $string, true));
 	}
 
-	public function is_available() {
+	public function is_available(): bool {
 	    if (!parent::is_available()) {
 	        return false;
         }
