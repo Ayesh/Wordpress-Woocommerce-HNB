@@ -93,18 +93,21 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 			'type'        => 'text',
 			'description' => sprintf(__('Merchant ID, provided by %s.'), self::INSTITUTION_NAME),
 			'default'     => '',
+			'desc_tip'    => true,
 		];
 		$this->form_fields['AcqID']       = [
 			'title'       => __('Acquirer ID'),
 			'type'        => 'text',
 			'description' => sprintf(__('Acquirer ID, provided by %s.'), self::INSTITUTION_NAME),
 			'default'     => '',
+			'desc_tip'    => true,
 		];
 		$this->form_fields['pass']        = [
 			'title'       => __('Password'),
 			'type'        => 'password',
 			'description' => sprintf(__('Payment gateway password, provided by %s.'), self::INSTITUTION_NAME),
 			'default'     => '',
+			'desc_tip'    => true,
 		];
 
 		$currency = get_woocommerce_currency();
@@ -120,6 +123,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 				'description' => sprintf(__('%s gateway requires an ISO 4217 currency code. This currency code taken from your %s default currency.'),
 					self::INSTITUTION_NAME, __('WooCommerce')),
 				'value'     => $currency_display,
+				'desc_tip'    => true,
 			];
 
 			$this->form_fields['_currency_exponent'] = [
@@ -127,6 +131,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 				'type'        => 'markup',
 				'description' => 'The exponent value used to normalize currencies. This value is automatically deduced.',
 				'value'     => $this->getCurrencyExponent($currency),
+				'desc_tip'    => true,
 			];
         }
 
@@ -135,6 +140,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 			'type'        => 'markup',
 			'description' => sprintf(__('Make sure this value matches the documentation provided %s. This is an important aspect of payment validation, and a mismatch can indicate this plugin version is not compatible with your implementation.'), self::INSTITUTION_NAME),
 			'value'     => self::$gateway_attributes['SignatureMethod'],
+			'desc_tip'    => true,
 		];
 
 		$this->form_fields['_caputure'] = [
@@ -142,6 +148,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 			'type'        => 'markup',
 			'description' => __('Payment capturing method. A value of "A" means automatic authorization and capturing. This value is not configurable at the moment.'),
 			'value'     => self::$gateway_attributes['CaptureFlag'],
+			'desc_tip'    => true,
 		];
 
 		$this->form_fields['_gateway_url'] = [
@@ -149,6 +156,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 			'type'        => 'markup',
 			'description' => __('The URL endpoint to submit data. This value is indicative.'),
 			'value'     => self::IPG_URL,
+			'desc_tip'    => true,
 		];
 	}
 
