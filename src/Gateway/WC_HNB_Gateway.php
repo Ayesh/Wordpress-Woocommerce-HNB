@@ -271,4 +271,70 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 	private function handlePayloadReal(array &$payload): void {
 
 	}
+
+	public function process_payment($order_id){
+		$order = new WC_Order($order_id);
+		return array('result' => 'success', 'redirect' => add_query_arg('order-pay',
+			$order->get_id(), add_query_arg('key', $order->get_order_key(), get_permalink(woocommerce_get_page_id('pay' ))))
+		);
+	}
+
+	public function ipg_page(int $order_id){
+	    $order = new WC_Order($order_id);
+	    $fields = $this->getIPGFields($order);
+	    $input_fields = '';
+	    foreach ($fields as $key => $value) {
+			$input_fields .= "<input type='hidden' name='$key' value='$value' />";
+        }
+	    $url = esc_attr(self::IPG_URL);
+	    $submit_text = __('Proceed to payment');
+	    $cancel_text = __('Cancel and return');
+	    $id = self::ID;
+	    $cancel_url = $order->get_cancel_order_url();
+	    echo <<<TEXT
+<form action="{$url}" method="post" id="ipg_payment_form-{$id}">
+{$input_fields}
+<input type="submit" class="button button-primary" value="{$submit_text}" />
+<a class="cancel" href="{$cancel_url}">{$cancel_text}</a>
+</form>
+TEXT;
+    }
+
+    private function generateSignatureOrder(WC_Order $order, string $formatted_total, int $currency_code): string {
+	    $string = "{$this->pass}{$order->get_id()}{$formatted_total}{$currency_code}";
+		return base64_encode(hash('sha1', $string, true));
+	}
+
+	public function is_available() {
+	    if (!parent::is_available()) {
+	        return false;
+        }
+
+	    return !empty($this->MerID) && !empty($this->AcqID) && !empty($this->pass);
+	}
+
+	private function getIPGFields(WC_Order $order): array {
+		$currency = get_woocommerce_currency();
+		$exponent = $this->getCurrencyExponent($currency);
+		$total = $order->get_total();
+		$total_formatted = (int) ($total * (10 ** $exponent));
+		$total_formatted = \str_pad($total_formatted, 12, 0, \STR_PAD_LEFT);
+		$currency_code = $this->getCurrencyList_ISO4217($currency);
+
+		$signature = $this->generateSignatureOrder($order, $total_formatted, $currency_code);
+
+		return [
+			'Version' => self::$gateway_attributes['Version'],
+			'MerID'   => $this->MerID,
+			'AcqID'   => $this->AcqID,
+			'MerRespURL' => $this->generateCallbackUrl($order->get_id()),
+			'PurchaseCurrency' => $currency_code,
+			'PurchaseCurrencyExponent' => $this->getCurrencyExponent($currency),
+			'OrderID' => $order->get_id(),
+			'SignatureMethod' => self::$gateway_attributes['SignatureMethod'],
+			'Signature' => $signature,
+			'CaptureFlag' => self::$gateway_attributes['CaptureFlag'],
+			'PurchaseAmt' => $total_formatted,
+		];
+	}
 }
