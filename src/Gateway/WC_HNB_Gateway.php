@@ -31,6 +31,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 
 	public function __construct() {
 		$this->initializeMetaData();
+		$this->registerActions();
 
 		// Load the settings.
 		$this->init_form_fields();
@@ -46,7 +47,10 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 		$this->PurchaseCurrency         = $this->settings['PurchaseCurrency'];
 		$this->PurchaseCurrencyExponent = $this->settings['PurchaseCurrencyExponent'];
 		$this->CaptureFlag              = $this->settings['CaptureFlag'];
+	}
 
+	private function registerActions(): void {
+		add_action('woocommerce_receipt_' . $this->id, [$this, 'ipg_page']);
 		add_action('woocommerce_update_options_payment_gateways_' . $this->id,
 			[$this, 'process_admin_options']);
 	}
