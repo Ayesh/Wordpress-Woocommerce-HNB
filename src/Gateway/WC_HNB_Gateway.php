@@ -19,7 +19,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 	private const INSTITUTION_NAME = 'HNB';
 
 	private static $gateway_attributes = [
-		'Version' => 1,
+		'Version' => '1.0.0',
 		'SignatureMethod' => 'SHA1',
 		'CaptureFlag' => 'A',
 	];
