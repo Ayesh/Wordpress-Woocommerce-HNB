@@ -146,7 +146,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 			'desc_tip'    => TRUE,
 		];
 
-		$this->form_fields['_caputure'] = [
+		$this->form_fields['_capture'] = [
 			'title'       => __('Capture Flag', self::TD),
 			'type'        => 'markup',
 			'description' => __('Payment capturing method. A value of "A" means automatic authorization and capturing. This value is not configurable at the moment.', self::TD),
@@ -252,7 +252,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 				$order->add_order_note(sprintf('Payment Declined: Reason code: %s. Reason: %s', esc_html($payload['ReasonCode']), esc_html($payload['ReasonCodeDesc'])));
 				$order->add_order_note('Payment declined.', 1);
 				wc_add_notice(__('Payment declined. Please try again.', self::TD), 'error');
-				wp_redirect($order->get_checkout_payment_url(false));
+				wp_redirect($order->get_checkout_payment_url());
 				break;
 
             case 1:
@@ -272,7 +272,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 				$order->add_order_note(sprintf('Payment Error: Reason code: %s. Reason: %s', esc_html($payload['ReasonCode']), esc_html($payload['ReasonCodeDesc'])));
 				$order->add_order_note('Payment Error', 1);
 				wc_add_notice(__('Payment error. Please try again.', self::TD), 'error');
-				wp_redirect($order->get_checkout_payment_url(false));
+				wp_redirect($order->get_checkout_payment_url());
 				break;
 		}
     }

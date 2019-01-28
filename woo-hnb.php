@@ -22,11 +22,12 @@ defined( 'ABSPATH' ) || die();
 
 add_filter('plugin_action_links_woo-hnb/woo-hnb.php', __NAMESPACE__ . '\action_links');
 add_filter('woocommerce_payment_gateways', __NAMESPACE__ . '\payment_gateway');
+/** @noinspection SpellCheckingInspection */
 add_action('woocommerce_api_ayeshwoocommercehnbgatewaywc_hnb_gateway', __NAMESPACE__ . '\handle_callback');
 
 
 function load(): void {
-	include_once dirname( __FILE__ ) . '/src/Gateway/WC_HNB_Gateway.php';
+	include_once __DIR__ . '/src/Gateway/WC_HNB_Gateway.php';
 }
 
 function action_links (array $links): array {
