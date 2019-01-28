@@ -20,7 +20,7 @@ use Ayesh\WooCommerceHNB\Gateway\WC_HNB_Gateway;
 
 defined( 'ABSPATH' ) || die();
 
-add_filter('plugin_action_links_woocommerce-hnb/woocommerce-hnb.php', __NAMESPACE__ . '\action_links');
+add_filter('plugin_action_links_woo-hnb/woo-hnb.php', __NAMESPACE__ . '\action_links');
 add_filter('woocommerce_payment_gateways', __NAMESPACE__ . '\payment_gateway');
 add_action('woocommerce_api_ayeshwoocommercehnbgatewaywc_hnb_gateway', __NAMESPACE__ . '\handle_callback');
 
