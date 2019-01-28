@@ -53,3 +53,21 @@ A "Payment Error" (as opposed to "Payment declined") often means there is someth
 = How do I contribute? =
 
 Please head over to [GitHub repository](https://github.com/Ayesh/wordpress-woocommerce-hnb). We use GitHub and Git, but individual releases are aded to WordPress.org SVN repository.
+
+== Installation ==
+
+= Minimum Requirements =
+
+- PHP 7.1 or later
+- `Acquire ID`, `Merchant ID`, and `Password` obtained from HNB.
+- Store served under a public-accessible HTTPS connection.
+
+= Automatic installation =
+
+Automatic installation is the easiest option as WordPress handles the file transfers itself and you don’t need to leave your web browser. To do an automatic install of this plugin, log in to your WordPress dashboard, navigate to the Plugins menu and click Add New.
+
+In the search field type “WooCommerce – Hatton National Bank Payment Gateway” and click Search Plugins. Once you’ve found our plugin you can view details about it such as the point release, rating and description. Most importantly of course, you can install it by simply clicking “Install Now”.
+
+= Manual installation =
+
+The manual installation method involves downloading our plugin and uploading it to your webserver via your favourite FTP application. The WordPress codex contains [instructions on how to do this here](https://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation).
