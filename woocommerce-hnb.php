@@ -11,7 +11,7 @@ use Ayesh\WooCommerceHNB\Gateway\WC_HNB_Gateway;
  * Version: 1.0.0
  * Author: Ayesh Karunaratne
  * Author URI: https://ayesh.me/open-source
- * Text Domain:  woocommerce-sampath-bank
+ * Text Domain:  woocommerce-hnb
  * WC requires at least: 3.3
  * WC tested up to: 3.5
  *

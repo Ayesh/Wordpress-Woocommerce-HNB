@@ -24,29 +24,24 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 		'CaptureFlag' => 'A',
 	];
 
-	private $MerID, $AcqID, $pass;
-	private $PurchaseCurrency, $PurchaseCurrencyExponent;
-	private $TestFlag, $ShipToLastName, $ResponseCode, $MerRespURL;
-
+	private $MerID, $AcqID, $pass; // Required fields.
 
 	public function __construct() {
 		$this->initializeMetaData();
 		$this->registerActions();
-
-		// Load the settings.
 		$this->init_form_fields();
-		$this->init_settings();
+        $this->populateProperties();
+	}
 
-		// Get settings.
-		$this->title                    = $this->get_option('title');
-		$this->description              = $this->get_option('description');
-		$this->MerID                    = $this->settings['MerID'];
-		$this->AcqID                    = $this->settings['AcqID'];
-		$this->pass                     = $this->settings['pass'];
-
-		$this->PurchaseCurrency         = $this->settings['PurchaseCurrency'];
-		$this->PurchaseCurrencyExponent = $this->settings['PurchaseCurrencyExponent'];
-		$this->CaptureFlag              = $this->settings['CaptureFlag'];
+	private function initializeMetaData(): void {
+		$this->id                 = self::ID;
+		$this->icon               = apply_filters('woocommerce_hnb_icon',
+			plugins_url('assets/images/cards.png',
+				\dirname(plugin_dir_path(__FILE__))));
+		$this->method_title       = __(self::NAME, 'woocommerce-hnb');
+		$this->method_description = __(self::DESCRIPTION, 'woocommerce-hnb');
+		$this->order_button_text  = __('Proceed to payment', 'woocommerce-hnb');
+		$this->has_fields         = FALSE;
 	}
 
 	private function registerActions(): void {
@@ -55,21 +50,19 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 			[$this, 'process_admin_options']);
 	}
 
-	private function initializeMetaData(): void {
-		$this->id                 = self::ID;
-		$this->icon               = apply_filters('woocommerce_hnb_icon',
-			plugins_url('assets/images/cards.png',
-			\dirname(plugin_dir_path(__FILE__))));
-		$this->method_title       = __(self::NAME, 'woocommerce-hnb');
-		$this->method_description = __(self::DESCRIPTION, 'woocommerce-hnb');
-		$this->order_button_text  = __('Proceed to payment', 'woocommerce-hnb');
-		$this->has_fields         = FALSE;
-	}
+	private function populateProperties(): void {
+		$this->init_settings();
+		$this->title       = $this->get_option('title');
+		$this->description = $this->get_option('description');
+		$this->MerID       = $this->settings['MerID'];
+		$this->AcqID       = $this->settings['AcqID'];
+		$this->pass        = $this->settings['pass'];
+    }
 
 	public function init_form_fields(): void {
 		$this->form_fields                = [];
 		$this->form_fields['enabled']     = [
-			'title'   => __('Enable/Disable'),
+			'title'   => \sprintf(__('Enable %s method'),self::INSTITUTION_NAME),
 			'type'    => 'checkbox',
 			'label'   => __('Enable HNB IPG Module.'),
 			'default' => 'no',
@@ -77,130 +70,97 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 		$this->form_fields['title']       = [
 			'title'       => __('Title'),
 			'type'        => 'text',
-			'description' => __('The title end users see when making the payment'),
+			'description' => __('Payment method name customers see when making the payment.'),
 			'default'     => __('Credit or debit card'),
 		];
 		$this->form_fields['description'] = [
 			'title'       => __('Description'),
 			'type'        => 'textarea',
-			'description' => __('A description to show to end users.'),
-			'default'     => sprintf(__('You will be sent to %s secure payment gateway to complete the payment.'), self::INSTITUTION_NAME),
+			'description' => __('A description to show to when this payment method is selected.'),
+			'default'     => \sprintf(__('You will be sent to %s secure payment gateway to complete the payment.'),
+				self::INSTITUTION_NAME),
 		];
-		$this->form_fields['_version']     = [
-			'title'       => __('Gateway Version'),
-			'type'        => 'markup',
-			'description' => '',
-			'value'     => self::$gateway_attributes['Version'],
+		$this->form_fields['_version']    = [
+			'title' => __('Gateway Version'),
+			'type'  => 'markup',
+			'value' => self::$gateway_attributes['Version'],
 		];
 		$this->form_fields['MerID']       = [
-			'title'       => __('Merchant ID'),
-			'type'        => 'text',
-			'description' => sprintf(__('Merchant ID, provided by %s.'), self::INSTITUTION_NAME),
-			'default'     => '',
-			'desc_tip'    => true,
+			'title'             => __('Merchant ID'),
+			'type'              => 'number',
+			'description'       => \sprintf(__('Merchant ID, provided by %s.'),
+				self::INSTITUTION_NAME),
+			'desc_tip'          => TRUE,
+			'custom_attributes' => ['required' => 'required'],
 		];
 		$this->form_fields['AcqID']       = [
-			'title'       => __('Acquirer ID'),
-			'type'        => 'text',
-			'description' => sprintf(__('Acquirer ID, provided by %s.'), self::INSTITUTION_NAME),
-			'default'     => '',
-			'desc_tip'    => true,
+			'title'             => __('Acquirer ID'),
+			'type'              => 'number',
+			'description'       => \sprintf(__('Acquirer ID, provided by %s.'),
+				self::INSTITUTION_NAME),
+			'desc_tip'          => TRUE,
+			'custom_attributes' => ['required' => 'required'],
 		];
 		$this->form_fields['pass']        = [
-			'title'       => __('Password'),
-			'type'        => 'password',
-			'description' => sprintf(__('Payment gateway password, provided by %s.'), self::INSTITUTION_NAME),
-			'default'     => '',
-			'desc_tip'    => true,
+			'title'             => __('Password'),
+			'type'              => 'password',
+			'description'       => \sprintf(__('Payment gateway password, provided by %s.'),
+				self::INSTITUTION_NAME),
+			'desc_tip'          => TRUE,
+			'custom_attributes' => ['required' => 'required'],
 		];
 
 		$currency = get_woocommerce_currency();
 		if ($currency) {
-			$currency_iso = $this->getCurrencyList_ISO4217($currency);
+			$currency_iso     = $this->getCurrencyList_ISO4217($currency);
 			$currency_display = $currency_iso
 				? \sprintf('%s (%d)', $currency, $currency_iso)
-				: \sprintf('%s %s', $currency, __('Unsupported'));
+				: \sprintf('%s %s', $currency,
+					__('Unsupported. Gateway disabled.'));
 
 			$this->form_fields['_currency'] = [
 				'title'       => __('Currency'),
 				'type'        => 'markup',
 				'description' => \sprintf(__('%s gateway requires an ISO 4217 currency code. This currency code taken from your %s default currency.'),
 					self::INSTITUTION_NAME, __('WooCommerce')),
-				'value'     => $currency_display,
-				'desc_tip'    => true,
+				'value'       => $currency_display,
+				'desc_tip'    => TRUE,
 			];
 
 			$this->form_fields['_currency_exponent'] = [
 				'title'       => __('Currency Exponent'),
 				'type'        => 'markup',
 				'description' => 'The exponent value used to normalize currencies. This value is automatically deduced.',
-				'value'     => $this->getCurrencyExponent($currency),
-				'desc_tip'    => true,
+				'value'       => $this->getCurrencyExponent($currency),
+				'desc_tip'    => TRUE,
 			];
-        }
+		}
 
 		$this->form_fields['_signature'] = [
 			'title'       => __('Signature Method'),
 			'type'        => 'markup',
-			'description' => \sprintf(__('Make sure this value matches the documentation provided %s. This is an important aspect of payment validation, and a mismatch can indicate this plugin version is not compatible with your implementation.'), self::INSTITUTION_NAME),
-			'value'     => self::$gateway_attributes['SignatureMethod'],
-			'desc_tip'    => true,
+			'description' => \sprintf(__('Make sure this value matches the documentation provided %s. This is an important aspect of payment validation, and a mismatch can indicate this plugin version is not compatible with your implementation.'),
+				self::INSTITUTION_NAME),
+			'value'       => self::$gateway_attributes['SignatureMethod'],
+			'desc_tip'    => TRUE,
 		];
 
 		$this->form_fields['_caputure'] = [
 			'title'       => __('Capture Flag'),
 			'type'        => 'markup',
 			'description' => __('Payment capturing method. A value of "A" means automatic authorization and capturing. This value is not configurable at the moment.'),
-			'value'     => self::$gateway_attributes['CaptureFlag'],
-			'desc_tip'    => true,
+			'value'       => self::$gateway_attributes['CaptureFlag'],
+			'desc_tip'    => TRUE,
 		];
 
 		$this->form_fields['_gateway_url'] = [
 			'title'       => __('Gateway URL'),
 			'type'        => 'markup',
 			'description' => __('The URL endpoint to submit data. This value is indicative.'),
-			'value'     => self::IPG_URL,
-			'desc_tip'    => true,
+			'value'       => self::IPG_URL,
+			'desc_tip'    => TRUE,
 		];
 	}
-
-
-	public function generate_markup_html($key, $data) {
-		$field_key = $this->get_field_key($key);
-		$defaults  = array(
-			'title'             => '',
-			'class'             => '',
-			'css'               => '',
-			'placeholder'       => '',
-			'type'              => 'text',
-			'desc_tip'          => FALSE,
-			'description'       => '',
-			'custom_attributes' => array(),
-			'value'             => '',
-		);
-
-		$data = wp_parse_args( $data, $defaults );
-
-		ob_start();
-		?>
-		<tr valign="top">
-			<th scope="row" class="titledesc">
-				<label for="<?php echo esc_attr( $field_key ); ?>"><?php echo wp_kses_post( $data['title'] ); ?> <?php echo $this->get_tooltip_html( $data ); // WPCS: XSS ok. ?></label>
-			</th>
-			<td class="forminp">
-				<fieldset>
-					<legend class="screen-reader-text"><span><?php echo wp_kses_post( $data['title'] ); ?></span></legend>
-					<span class="wc_input_markup <?php echo esc_attr( $data['class'] ); ?>" id="<?php echo esc_attr( $field_key ); ?>" style="<?php echo esc_attr( $data['css'] ); ?>" <?php echo $this->get_custom_attribute_html( $data ); // WPCS: XSS ok. ?> />
-					<?php echo wp_kses_post($data['value']); ?>
-					<?php echo $this->get_description_html( $data ); // WPCS: XSS ok. ?>
-				</fieldset>
-			</td>
-		</tr>
-		<?php
-
-		return ob_get_clean();
-	}
-
 
 	private function getCurrencyList_ISO4217(string $currency_code = 'LKR'): ?int {
 		$map = [
@@ -284,7 +244,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
             'ReasonCodeDesc' => '',
             'ReasonCode'=> '',
         ];
-	    $payload = array_merge($payload_stub, $payload);
+	    $payload = \array_merge($payload_stub, $payload);
 
 	    switch ($payload['ResponseCode']) {
             case 2:
@@ -333,7 +293,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
         ];
 	}
 
-	public function ipg_page(int $order_id){
+	public function ipg_page(int $order_id): void {
 	    $order = new WC_Order($order_id);
 	    $fields = $this->getIPGFields($order);
 	    $input_fields = '';
@@ -364,7 +324,8 @@ TEXT;
 	        return false;
         }
 
-	    return !empty($this->MerID) && !empty($this->AcqID) && !empty($this->pass);
+		$currency = get_woocommerce_currency();
+	    return !empty($this->MerID) && !empty($this->AcqID) && !empty($this->pass) && $this->getCurrencyList_ISO4217($currency);
 	}
 
 	private function getIPGFields(WC_Order $order): array {
@@ -390,5 +351,41 @@ TEXT;
 			'CaptureFlag' => self::$gateway_attributes['CaptureFlag'],
 			'PurchaseAmt' => $total_formatted,
 		];
+	}
+
+	public function generate_markup_html($key, $data) {
+		$field_key = $this->get_field_key($key);
+		$defaults  = [
+			'title'             => '',
+			'class'             => '',
+			'css'               => '',
+			'placeholder'       => '',
+			'type'              => 'text',
+			'desc_tip'          => FALSE,
+			'description'       => '',
+			'custom_attributes' => [],
+			'value'             => '',
+		];
+
+		$data = wp_parse_args( $data, $defaults );
+
+		ob_start();
+		?>
+        <tr valign="top">
+            <th scope="row" class="titledesc">
+                <label for="<?php echo esc_attr( $field_key ); ?>"><?php echo wp_kses_post( $data['title'] ); ?> <?php echo $this->get_tooltip_html( $data ); // WPCS: XSS ok. ?></label>
+            </th>
+            <td class="forminp">
+                <fieldset>
+                    <legend class="screen-reader-text"><span><?php echo wp_kses_post( $data['title'] ); ?></span></legend>
+                    <span class="wc_input_markup <?php echo esc_attr( $data['class'] ); ?>" id="<?php echo esc_attr( $field_key ); ?>" style="<?php echo esc_attr( $data['css'] ); ?>" <?php echo $this->get_custom_attribute_html( $data ); // WPCS: XSS ok. ?> />
+					<?php echo wp_kses_post($data['value']); ?>
+					<?php echo $this->get_description_html( $data ); // WPCS: XSS ok. ?>
+                </fieldset>
+            </td>
+        </tr>
+		<?php
+
+		return ob_get_clean();
 	}
 }
