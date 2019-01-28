@@ -269,14 +269,68 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
     }
 
 	private function handlePayloadReal(array &$payload): void {
+	    $order = new WC_Order($payload['order_id']);
+	    if (!$order || empty($payload['ResponseCode']) || !is_scalar($payload['ResponseCode'])|| !$order->get_id()) {
+			wp_redirect(home_url('/')); die();
+        }
 
+	    $this->handleResponse($payload, $order);
+	    die();
 	}
 
-	public function process_payment($order_id){
+	private function handleResponse(array $payload, WC_Order $order): void {
+	    $payload_stub = [
+	        'ResponseCode' => '',
+            'ReasonCodeDesc' => '',
+            'ReasonCode'=> '',
+        ];
+	    $payload = array_merge($payload_stub, $payload);
+
+	    switch ($payload['ResponseCode']) {
+            case 2:
+				$order->add_order_note(sprintf('Payment Declined: Reason code: %s. Reason: %s', esc_html($payload['ReasonCode']), esc_html($payload['ReasonCodeDesc'])));
+				$order->add_order_note('Payment declined.', 1);
+				wc_add_notice(__('Payment declined. Please try again.'), 'error');
+				wp_redirect($order->get_checkout_payment_url(false));
+				break;
+
+            case 1:
+				$valid = $this->validateSignature($payload, $order);
+				if ($valid) {
+					$order->add_order_note('Payment Successful: Reason code: %s. Reason: %s', esc_html($payload['ReasonCode']), esc_html($payload['ReasonCodeDesc']));
+					$order->payment_complete();
+					wp_redirect($this->get_return_url($order));
+					break;
+                }
+				$order->add_order_note('Payment signature mismatch. This indicates a possible forged requests.');
+				$order->add_order_note('Payment validation failed.', 1);
+				wc_add_notice(__('Payment validation error. Please try again.'), 'error');
+				break;
+
+			default:
+				$order->add_order_note(sprintf('Payment Error: Reason code: %s. Reason: %s', esc_html($payload['ReasonCode']), esc_html($payload['ReasonCodeDesc'])));
+				$order->add_order_note('Payment Error', 1);
+				wc_add_notice(__('Payment error. Please try again.'), 'error');
+				wp_redirect($order->get_checkout_payment_url(false));
+				break;
+		}
+    }
+
+    private function validateSignature(array $payload, WC_Order $order): bool {
+	    if (empty($payload['Signature']) || !\is_string($payload['Signature'])) {
+	        return false;
+        }
+        $valid_signature = $this->generateSignatureOrder($order);
+        return \hash_equals($valid_signature, $payload['Signature']);
+    }
+
+	public function process_payment($order_id): array {
 		$order = new WC_Order($order_id);
-		return array('result' => 'success', 'redirect' => add_query_arg('order-pay',
-			$order->get_id(), add_query_arg('key', $order->get_order_key(), get_permalink(woocommerce_get_page_id('pay' ))))
-		);
+		$order->get_checkout_payment_url(true);
+		return [
+		        'result' => 'success',
+                'redirect' => $order->get_checkout_payment_url(true)
+        ];
 	}
 
 	public function ipg_page(int $order_id){
