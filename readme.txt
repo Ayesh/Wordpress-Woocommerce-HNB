@@ -52,4 +52,4 @@ A "Payment Error" (as opposed to "Payment declined") often means there is someth
 
 = How do I contribute? =
 
-Please head over to [GitHub repository](https://github.com/Ayesh/wordpress-woocommerce-hnb).
+Please head over to [GitHub repository](https://github.com/Ayesh/wordpress-woocommerce-hnb). We use GitHub and Git, but individual releases are aded to WordPress.org SVN repository.
