@@ -3,6 +3,7 @@
 
 namespace Ayesh\WooCommerceHNB\Gateway;
 
+use WC_Order;
 use WC_Payment_Gateway;
 
 /**
