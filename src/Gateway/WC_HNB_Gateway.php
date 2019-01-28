@@ -59,7 +59,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 		$this->id                 = self::ID;
 		$this->icon               = apply_filters('woocommerce_hnb_icon',
 			plugins_url('assets/images/cards.png',
-			dirname(plugin_dir_path(__FILE__))));
+			\dirname(plugin_dir_path(__FILE__))));
 		$this->method_title       = __(self::NAME, 'woocommerce-hnb');
 		$this->method_description = __(self::DESCRIPTION, 'woocommerce-hnb');
 		$this->order_button_text  = __('Proceed to payment', 'woocommerce-hnb');
@@ -118,13 +118,13 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 		if ($currency) {
 			$currency_iso = $this->getCurrencyList_ISO4217($currency);
 			$currency_display = $currency_iso
-				? sprintf('%s (%d)', $currency, $currency_iso)
-				: sprintf('%s %s', $currency, __('Unsupported'));
+				? \sprintf('%s (%d)', $currency, $currency_iso)
+				: \sprintf('%s %s', $currency, __('Unsupported'));
 
 			$this->form_fields['_currency'] = [
 				'title'       => __('Currency'),
 				'type'        => 'markup',
-				'description' => sprintf(__('%s gateway requires an ISO 4217 currency code. This currency code taken from your %s default currency.'),
+				'description' => \sprintf(__('%s gateway requires an ISO 4217 currency code. This currency code taken from your %s default currency.'),
 					self::INSTITUTION_NAME, __('WooCommerce')),
 				'value'     => $currency_display,
 				'desc_tip'    => true,
@@ -142,7 +142,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 		$this->form_fields['_signature'] = [
 			'title'       => __('Signature Method'),
 			'type'        => 'markup',
-			'description' => sprintf(__('Make sure this value matches the documentation provided %s. This is an important aspect of payment validation, and a mismatch can indicate this plugin version is not compatible with your implementation.'), self::INSTITUTION_NAME),
+			'description' => \sprintf(__('Make sure this value matches the documentation provided %s. This is an important aspect of payment validation, and a mismatch can indicate this plugin version is not compatible with your implementation.'), self::INSTITUTION_NAME),
 			'value'     => self::$gateway_attributes['SignatureMethod'],
 			'desc_tip'    => true,
 		];
@@ -237,7 +237,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 		if (empty($payload['order_id'])
             || !($order_id = (int) $payload['order_id'])
             || empty($payload['token'])
-            || !is_string($payload['token'])
+            || !\is_string($payload['token'])
         ) {
 			return -1;
 		}
@@ -260,12 +260,12 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 
     private static function generateToken(int $order_id): string {
       $key = wp_salt('nonce');
-      return hash_hmac('sha256', __CLASS__ . '-' . $order_id, $key);
+      return \hash_hmac('sha256', __CLASS__ . '-' . $order_id, $key);
     }
 
     private static function validateToken(string $given_token, int $order_id): bool {
         $valid_token = self::generateToken($order_id);
-        return hash_equals($valid_token, $given_token);
+        return \hash_equals($valid_token, $given_token);
     }
 
 	private function handlePayloadReal(array &$payload): void {
