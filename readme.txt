@@ -71,3 +71,12 @@ In the search field type “WooCommerce – Hatton National Bank Payment Gateway
 = Manual installation =
 
 The manual installation method involves downloading our plugin and uploading it to your webserver via your favourite FTP application. The WordPress codex contains [instructions on how to do this here](https://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation).
+
+== Screenshots ==
+
+1. Enable the plugin
+2. WooCommerce Payments tab shows the new "HNB Online Payment" method
+3. Configure the payment gateway
+4. Payment option in the checkout page
+5. Payment configuration page
+6. HNB payment gateway page
