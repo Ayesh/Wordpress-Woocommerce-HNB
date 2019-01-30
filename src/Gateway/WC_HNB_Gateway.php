@@ -282,7 +282,8 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 	    if (empty($payload['Signature']) || !\is_string($payload['Signature'])) {
 	        return false;
         }
-        $valid_signature = $this->generateSignatureOrder($order);
+
+        $valid_signature = $this->generateSignatureOrder($order, $payload['ResponseCode']);
         return \hash_equals($valid_signature, $payload['Signature']);
     }
 
