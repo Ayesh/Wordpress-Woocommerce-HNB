@@ -266,6 +266,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 				$order->add_order_note('Payment signature mismatch. This indicates a possible forged request.');
 				$order->add_order_note('Payment validation failed.', 1);
 				wc_add_notice(__('Payment validation error. Please try again.', self::TD), 'error');
+				wp_redirect($order->get_checkout_payment_url());
 				break;
 
 			default:
