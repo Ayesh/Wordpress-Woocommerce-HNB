@@ -13,7 +13,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 WooCommerce HNB plugin is a free and open source plugin to integrate Hatton National Bank Internet Payment Gateway with your WooCommerce store.
 
 ### Features
- - Totally free! No need to buy a licenses.
+ - Totally free! No need to buy a license.
  - Lightweight yet fully functional integration.
  - Written with modern PHP code, making the code light weight and easy to read.
  - Thoroughly and securely validates the payments upon receipt.
@@ -23,7 +23,6 @@ WooCommerce HNB plugin is a free and open source plugin to integrate Hatton Nati
 ### Prerequisites
  - PHP 7.1 or later
  - `Acquire ID`, `Merchant ID`, and `Password` obtained from HNB.
- - Store served under a public-accessible HTTPS connection.
 
 Note that PHP 5.6 and older versions no longer receive official security updates. PHP 7.1 only receives security fixes, it is highly recommended that you use the latest PHP version. This plugin is tested with PHP versions upto 7.3.
 
@@ -52,7 +51,7 @@ A "Payment Error" (as opposed to "Payment declined") often means there is someth
 
 = How do I contribute? =
 
-Please head over to [GitHub repository](https://github.com/Ayesh/wordpress-woocommerce-hnb). We use GitHub and Git, but individual releases are aded to WordPress.org SVN repository.
+Please head over to [GitHub repository](https://github.com/Ayesh/wordpress-woocommerce-hnb). We use GitHub/Git, but individual releases are aded to WordPress.org SVN repository.
 
 == Installation ==
 
@@ -60,7 +59,6 @@ Please head over to [GitHub repository](https://github.com/Ayesh/wordpress-wooco
 
 - PHP 7.1 or later
 - `Acquire ID`, `Merchant ID`, and `Password` obtained from HNB.
-- Store served under a public-accessible HTTPS connection.
 
 = Automatic installation =
 
