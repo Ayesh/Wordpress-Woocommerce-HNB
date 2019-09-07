@@ -12,12 +12,12 @@ use WC_Payment_Gateway;
  * @package     Ayesh/WooCommerceHNB
  */
 final class WC_HNB_Gateway extends WC_Payment_Gateway {
-	private const NAME = 'HNB Online Payment';
-	private const ID = 'hnb_ipg';
-	private const DESCRIPTION = 'Hatton National Bank Internet Payment Gateway to accept Visa/Master credit and debit cards issued both locally and internationally.';
-	private const IPG_URL = 'https://www.hnbpg.hnb.lk/SENTRY/PaymentGateway/Application/ReDirectLink.aspx';
-	private const INSTITUTION_NAME = 'HNB';
-	private const TD = 'woo-hnb';
+	const NAME = 'HNB Online Payment';
+	const ID = 'hnb_ipg';
+	const DESCRIPTION = 'Hatton National Bank Internet Payment Gateway to accept Visa/Master credit and debit cards issued both locally and internationally.';
+	const IPG_URL = 'https://www.hnbpg.hnb.lk/SENTRY/PaymentGateway/Application/ReDirectLink.aspx';
+	const INSTITUTION_NAME = 'HNB';
+	const TD = 'woo-hnb';
 
 	private static $gateway_attributes = [
 		'Version' => '1.0.0',
@@ -163,7 +163,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 		];
 	}
 
-	private function getCurrencyList_ISO4217(string $currency_code = 'LKR'): ?int {
+	private function getCurrencyList_ISO4217(string $currency_code = 'LKR'): int {
 		$map = [
 			'AED' => 784,
 			'AUD' => 036,
@@ -175,7 +175,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 			'USD' => 840,
 		];
 
-		return $map[$currency_code] ?? NULL;
+		return $map[$currency_code] ?? 0;
 	}
 
 	private function getCurrencyExponent(string $currency = 'LKR'): int {
