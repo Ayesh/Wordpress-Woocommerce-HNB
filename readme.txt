@@ -2,9 +2,9 @@
 Contributors: ayeshrajans
 Tags: woocommerce, woo commerce, payment, sri lanka, payment gateway, lkr, WooCommerce - Hatton National Bank Payment Gateway, Hatton National Bank, HNB, HNB IPG
 Requires at least: 4.9
-Tested up to: 5.4
+Tested up to: 5.6
 Requires PHP: 7.1
-Stable tag: 1.0.
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,13 +18,13 @@ WooCommerce HNB plugin is a free and open source plugin to integrate Hatton Nati
  - Written with modern PHP code, making the code light weight and easy to read.
  - Thoroughly and securely validates the payments upon receipt.
  - Security measures to prevent sensitive data exposure.
- - Translated to Sinhala (සිංහල) and Tamil (தமிழ்) by native speakers.
+ - Translated to Sinhala (සිංහල) and Tamil (தமிழ்)  by native speakers.
 
 ### Prerequisites
  - PHP 7.1 or later
  - `Acquire ID`, `Merchant ID`, and `Password` obtained from HNB.
 
-Note that PHP 5.6 and older versions no longer receive official security updates. PHP 7.1 only receives security fixes, it is highly recommended that you use the latest PHP version. This plugin is tested with PHP versions upto 7.3.
+Note that PHP 5.6 and older versions no longer receive official security updates. PHP 7.1 only receives security fixes, it is highly recommended that you use the latest PHP version. This plugin is tested with PHP versions upto [PHP 8.0](https://php.watch/versions/8.0).
 
 ### Configuration
 Once enabled, you will see a *Settings* link under the *WooCommece HNB* plugin name. This button, or *WooCommerce Settings -> Payments -> HNB Online Payment* will take you to the plugin configuration page.
