@@ -1,10 +1,33 @@
 <?php
 
-
 namespace Ayesh\WooCommerceHNB\Gateway;
 
 use WC_Order;
 use WC_Payment_Gateway;
+
+use function __;
+use function add_action;
+use function array_merge;
+use function base64_encode;
+use function dirname;
+use function esc_attr;
+use function hash;
+use function hash_equals;
+use function hash_hmac;
+use function home_url;
+use function is_scalar;
+use function is_string;
+use function ob_get_clean;
+use function ob_start;
+use function plugins_url;
+use function sprintf;
+use function str_pad;
+use function wc_add_notice;
+use function wp_kses_post;
+use function wp_redirect;
+use function wp_salt;
+
+use const STR_PAD_LEFT;
 
 /**
  * WooCommerce Payment Gateway integration for Hatton National Bank IPG.
@@ -12,12 +35,12 @@ use WC_Payment_Gateway;
  * @package     Ayesh/WooCommerceHNB
  */
 final class WC_HNB_Gateway extends WC_Payment_Gateway {
-	const NAME = 'HNB Online Payment';
-	const ID = 'hnb_ipg';
-	const DESCRIPTION = 'Hatton National Bank Internet Payment Gateway to accept Visa/Master credit and debit cards issued both locally and internationally.';
-	const IPG_URL = 'https://www.hnbpg.hnb.lk/SENTRY/PaymentGateway/Application/ReDirectLink.aspx';
-	const INSTITUTION_NAME = 'HNB';
-	const TD = 'woo-hnb';
+	private const NAME = 'HNB Online Payment';
+	private const ID = 'hnb_ipg';
+	private const DESCRIPTION = 'Hatton National Bank Internet Payment Gateway to accept Visa/Master credit and debit cards issued both locally and internationally.';
+	private const IPG_URL = 'https://www.hnbpg.hnb.lk/SENTRY/PaymentGateway/Application/ReDirectLink.aspx';
+	private const INSTITUTION_NAME = 'HNB';
+	private const TD = 'woo-hnb';
 
 	private static $gateway_attributes = [
 		'Version' => '1.0.0',
