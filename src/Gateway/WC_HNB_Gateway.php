@@ -206,10 +206,9 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 	    return 2; // All supported currencies use 2.
     }
 
-	public static function handlePayload(array &$payload): void {
-	    $code = self::validatePayload($payload);
-	    if ($code !== 0) {
-	        wp_die($code);
+	public static function handlePayload(array $payload): void {
+	    if (!self::validatePayload($payload)) {
+	        wp_die(1);
         }
 
 	    $instance = new static();
@@ -217,25 +216,25 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 	    die(0);
 	}
 
-	private static function validatePayload(array $payload): int {
+	private static function validatePayload(array $payload): bool {
 		if (empty($payload['order_id'])
             || !($order_id = (int) $payload['order_id'])
             || empty($payload['token'])
             || !is_string($payload['token'])
         ) {
-			return -1;
+			return false;
 		}
 
 		if (!self::validateToken($payload['token'], $order_id)) {
-		    return -1;
+		    return false;
         }
 
-		return 0;
+		return true;
     }
 
 	private function generateCallbackUrl(int $order_id): string {
 		return add_query_arg(
-		    [
+            [
 		        'wc-api' => __CLASS__,
                 'order_id' => $order_id,
                 'token' => self::generateToken($order_id),
