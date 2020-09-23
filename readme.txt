@@ -78,3 +78,15 @@ The manual installation method involves downloading our plugin and uploading it 
 4. Payment option in the checkout page
 5. Payment configuration page
 6. HNB payment gateway page
+
+== Changelog ==
+
+**1.0**
+
+ - Initial release.
+
+**1.0.1**
+
+ - Fix a missing sprintf() call in order notes.
+ - Add class constant modifiers to gateway class constants.
+ - Various code performance improvements with FQFN and FQCN tweaks.
