@@ -7,6 +7,7 @@ use WC_Payment_Gateway;
 
 use function __;
 use function add_action;
+use function add_query_arg;
 use function array_merge;
 use function base64_encode;
 use function dirname;
@@ -61,7 +62,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 		$this->id                 = self::ID;
 		$this->icon               = apply_filters('woocommerce_hnb_icon',
 			plugins_url('assets/images/cards.png',
-				\dirname(plugin_dir_path(__FILE__))));
+                         dirname(plugin_dir_path(__FILE__))));
 		$this->method_title       = __(self::NAME, 'woocommerce-hnb', self::TD);
 		$this->method_description = __(self::DESCRIPTION, 'woocommerce-hnb', self::TD);
 		$this->order_button_text  = __('Proceed to payment', 'woocommerce-hnb', self::TD);
@@ -71,7 +72,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 	private function registerActions(): void {
 		add_action('woocommerce_receipt_' . $this->id, [$this, 'ipg_page']);
 		add_action('woocommerce_update_options_payment_gateways_' . $this->id,
-			[$this, 'process_admin_options']);
+                   [$this, 'process_admin_options']);
 	}
 
 	private function populateProperties(): void {
@@ -86,7 +87,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 	public function init_form_fields(): void {
 		$this->form_fields                = [];
 		$this->form_fields['enabled']     = [
-			'title'   => \sprintf(__('Enable %s method', self::TD),self::INSTITUTION_NAME),
+			'title'   => sprintf(__('Enable %s method', self::TD), self::INSTITUTION_NAME),
 			'type'    => 'checkbox',
 			'label'   => __('Enable HNB IPG Module.', self::TD),
 			'default' => 'no',
@@ -101,8 +102,8 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 			'title'       => __('Description', self::TD),
 			'type'        => 'textarea',
 			'description' => __('A description to show to when this payment method is selected.', self::TD),
-			'default'     => \sprintf(__('You will be sent to %s secure payment gateway to complete the payment.', self::TD),
-				self::INSTITUTION_NAME),
+			'default'     => sprintf(__('You will be sent to %s secure payment gateway to complete the payment.', self::TD),
+                                     self::INSTITUTION_NAME),
 		];
 		$this->form_fields['_version']    = [
 			'title' => __('Gateway Version', self::TD),
@@ -112,24 +113,24 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 		$this->form_fields['MerID']       = [
 			'title'             => __('Merchant ID', self::TD),
 			'type'              => 'number',
-			'description'       => \sprintf(__('Merchant ID, provided by %s.', self::TD),
-				self::INSTITUTION_NAME),
+			'description'       => sprintf(__('Merchant ID, provided by %s.', self::TD),
+                                           self::INSTITUTION_NAME),
 			'desc_tip'          => TRUE,
 			'custom_attributes' => ['required' => 'required'],
 		];
 		$this->form_fields['AcqID']       = [
 			'title'             => __('Acquirer ID', self::TD),
 			'type'              => 'number',
-			'description'       => \sprintf(__('Acquirer ID, provided by %s.', self::TD),
-				self::INSTITUTION_NAME),
+			'description'       => sprintf(__('Acquirer ID, provided by %s.', self::TD),
+                                           self::INSTITUTION_NAME),
 			'desc_tip'          => TRUE,
 			'custom_attributes' => ['required' => 'required'],
 		];
 		$this->form_fields['pass']        = [
 			'title'             => __('Password', self::TD),
 			'type'              => 'password',
-			'description'       => \sprintf(__('Payment gateway password, provided by %s.', self::TD),
-				self::INSTITUTION_NAME),
+			'description'       => sprintf(__('Payment gateway password, provided by %s.', self::TD),
+                                           self::INSTITUTION_NAME),
 			'desc_tip'          => TRUE,
 			'custom_attributes' => ['required' => 'required'],
 		];
@@ -138,15 +139,15 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 		if ($currency) {
 			$currency_iso     = $this->getCurrencyList_ISO4217($currency);
 			$currency_display = $currency_iso
-				? \sprintf('%s (%d)', $currency, $currency_iso)
-				: \sprintf('%s %s', $currency,
-					__('Unsupported. Gateway disabled.', self::TD));
+				? sprintf('%s (%d)', $currency, $currency_iso)
+				: sprintf('%s %s', $currency,
+                          __('Unsupported. Gateway disabled.', self::TD));
 
 			$this->form_fields['_currency'] = [
 				'title'       => __('Currency'),
 				'type'        => 'markup',
-				'description' => \sprintf(__('%s gateway requires an ISO 4217 currency code. This currency code taken from your %s default currency.', self::TD),
-					self::INSTITUTION_NAME, __('WooCommerce')), // No text domain.
+				'description' => sprintf(__('%s gateway requires an ISO 4217 currency code. This currency code taken from your %s default currency.', self::TD),
+                                         self::INSTITUTION_NAME, __('WooCommerce')), // No text domain.
 				'value'       => $currency_display,
 				'desc_tip'    => TRUE,
 			];
@@ -163,8 +164,8 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 		$this->form_fields['_signature'] = [
 			'title'       => __('Signature Method', self::TD),
 			'type'        => 'markup',
-			'description' => \sprintf(__('Make sure this value matches the documentation provided %s. This is an important aspect of payment validation, and a mismatch can indicate this plugin version is not compatible with your implementation.', self::TD),
-				self::INSTITUTION_NAME),
+			'description' => sprintf(__('Make sure this value matches the documentation provided %s. This is an important aspect of payment validation, and a mismatch can indicate this plugin version is not compatible with your implementation.', self::TD),
+                                     self::INSTITUTION_NAME),
 			'value'       => self::$gateway_attributes['SignatureMethod'],
 			'desc_tip'    => TRUE,
 		];
@@ -211,7 +212,6 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 	        wp_die($code);
         }
 
-
 	    $instance = new static();
 	    $instance->handlePayloadReal($payload);
 	    die(0);
@@ -221,7 +221,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 		if (empty($payload['order_id'])
             || !($order_id = (int) $payload['order_id'])
             || empty($payload['token'])
-            || !\is_string($payload['token'])
+            || !is_string($payload['token'])
         ) {
 			return -1;
 		}
@@ -244,12 +244,12 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 
     private static function generateToken(int $order_id): string {
       $key = wp_salt('nonce');
-      return \hash_hmac('sha256', __CLASS__ . '-' . $order_id, $key);
+      return hash_hmac('sha256', __CLASS__ . '-' . $order_id, $key);
     }
 
     private static function validateToken(string $given_token, int $order_id): bool {
         $valid_token = self::generateToken($order_id);
-        return \hash_equals($valid_token, $given_token);
+        return hash_equals($valid_token, $given_token);
     }
 
 	private function handlePayloadReal(array $payload): void {
@@ -268,7 +268,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
             'ReasonCodeDesc' => '',
             'ReasonCode'=> '',
         ];
-	    $payload = \array_merge($payload_stub, $payload);
+	    $payload = array_merge($payload_stub, $payload);
 
 	    switch ($payload['ResponseCode']) {
             case 2:
@@ -302,12 +302,12 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
     }
 
     private function validateSignature(array $payload, WC_Order $order): bool {
-	    if (empty($payload['Signature']) || !\is_string($payload['Signature'])) {
+	    if (empty($payload['Signature']) || !is_string($payload['Signature'])) {
 	        return false;
         }
 
         $valid_signature = $this->generateSignatureOrder($order, $payload['ResponseCode']);
-        return \hash_equals($valid_signature, $payload['Signature']);
+        return hash_equals($valid_signature, $payload['Signature']);
     }
 
 	public function process_payment($order_id): array {
@@ -342,7 +342,7 @@ TEXT;
 
     private function generateSignatureOrder(WC_Order $order, string $formatted_total = null, int $currency_code = null): string {
 	    $string = "{$this->pass}{$this->MerID}{$this->AcqID}{$order->get_id()}{$formatted_total}{$currency_code}";
-		return \base64_encode(\hash('sha1', $string, true));
+		return base64_encode(hash('sha1', $string, true));
 	}
 
 	public function is_available(): bool {
@@ -359,7 +359,7 @@ TEXT;
 		$exponent = $this->getCurrencyExponent($currency);
 		$total = $order->get_total();
 		$total_formatted = (int) ($total * (10 ** $exponent));
-		$total_formatted = \str_pad($total_formatted, 12, 0, \STR_PAD_LEFT);
+		$total_formatted = str_pad($total_formatted, 12, 0, STR_PAD_LEFT);
 		$currency_code = $this->getCurrencyList_ISO4217($currency);
 
 		$signature = $this->generateSignatureOrder($order, $total_formatted, $currency_code);
