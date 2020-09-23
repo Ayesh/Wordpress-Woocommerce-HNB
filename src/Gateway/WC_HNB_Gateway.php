@@ -239,7 +239,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
 		        'wc-api' => __CLASS__,
                 'order_id' => $order_id,
                 'token' => self::generateToken($order_id),
-            ], home_url( '/' ) );
+            ], home_url('/' ) );
     }
 
     private static function generateToken(int $order_id): string {
@@ -252,7 +252,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
         return \hash_equals($valid_token, $given_token);
     }
 
-	private function handlePayloadReal(array &$payload): void {
+	private function handlePayloadReal(array $payload): void {
 	    $order = new WC_Order($payload['order_id']);
 	    if (!$order || empty($payload['ResponseCode']) || !is_scalar($payload['ResponseCode'])|| !$order->get_id()) {
 			wp_redirect(home_url('/')); die();

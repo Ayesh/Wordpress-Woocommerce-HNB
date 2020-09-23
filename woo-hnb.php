@@ -43,6 +43,5 @@ function payment_gateway(array $methods): array {
 
 function handle_callback() {
 	load();
-	$request = &$_REQUEST;
-	WC_HNB_Gateway::handlePayload($request);
+	WC_HNB_Gateway::handlePayload($_REQUEST);
 }
