@@ -258,7 +258,7 @@ final class WC_HNB_Gateway extends WC_Payment_Gateway {
             case 1:
 				$valid = $this->validateSignature($payload, $order);
 				if ($valid) {
-					$order->add_order_note('Payment Successful: Reason code: %s. Reason: %s', esc_html($payload['ReasonCode']), esc_html($payload['ReasonCodeDesc']));
+					$order->add_order_note(sprintf('Payment Successful: Reason code: %s. Reason: %s', esc_html($payload['ReasonCode']), esc_html($payload['ReasonCodeDesc'])));
 					$order->payment_complete();
 					wp_redirect($this->get_return_url($order));
 					break;
