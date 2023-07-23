@@ -10,10 +10,10 @@ use Ayesh\WooCommerceHNB\Gateway\WC_HNB_Gateway;
  * Description: WooCommerce Payment Gateway plugin integration with Hatton National Bank Sri Lanka.
  * Version: 1.0.1
  * Author: Ayesh Karunaratne
- * Author URI: https://ayesh.me/open-source
+ * Author URI: https://aye.sh/open-source
  * Text Domain: woo-hnb
  * WC requires at least: 3.3
- * WC tested up to: 4.5
+ * WC tested up to: 7.9
  *
  * @package Ayesh\WooCommerceHNB
  */
@@ -22,7 +22,6 @@ defined( 'ABSPATH' ) || die();
 
 add_filter('plugin_action_links_woo-hnb/woo-hnb.php', __NAMESPACE__ . '\action_links');
 add_filter('woocommerce_payment_gateways', __NAMESPACE__ . '\payment_gateway');
-/** @noinspection SpellCheckingInspection */
 add_action('woocommerce_api_ayeshwoocommercehnbgatewaywc_hnb_gateway', __NAMESPACE__ . '\handle_callback');
 
 
