@@ -2,7 +2,7 @@
 Contributors: ayeshrajans
 Tags: woocommerce, woo commerce, payment, sri lanka, payment gateway, lkr, WooCommerce - Hatton National Bank Payment Gateway, Hatton National Bank, HNB, HNB IPG
 Requires at least: 4.9
-Tested up to: 6.3
+Tested up to: 6.8
 Requires PHP: 7.1
 Stable tag: 1.1.1
 License: GPLv2 or later
